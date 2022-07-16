@@ -10,4 +10,12 @@
     <dimen name="liner_padding">4dp</dimen>
     <dimen name="login_text_size">28sp</dimen>
     <dimen name="uid_text_size">18sp</dimen>
+    <dimen name="title_padding_top">5dp</dimen>
+    <dimen name="title_info_activity_size">24sp</dimen>
+    <dimen name="card_view_margin">10dp</dimen>
+    <dimen name="card_view_corner_radius">150dp</dimen>
+    <dimen name="shape_layout_width">300dp</dimen>
+    <dimen name="shape_layout_height">300dp</dimen>
+    <dimen name="label_info_size">18sp</dimen>
+    <dimen name="user_info_field_text_size">22sp</dimen>
 </resources>

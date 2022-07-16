@@ -8,4 +8,5 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="backRefresh">#A9D1BD</color>
+    <color name="color_title_info">#079507</color>
 </resources>
