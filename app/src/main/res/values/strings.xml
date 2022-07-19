@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">GitApp</string>
     <string name="refresh">Refresh</string>
+    <string name="title_info_activity">GitHub user info</string>
+    <string name="login">login:</string>
+    <string name="user_name">name:</string>
+    <string name="user_location">location:</string>
 </resources>

@@ -1,79 +1,73 @@
 package ru.gb.ispanecfeo.ui.users
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import ru.gb.ispanecfeo.app
 import ru.gb.ispanecfeo.databinding.ActivityMainBinding
 import ru.gb.ispanecfeo.domain.entities.UserEntity
-import ru.gb.ispanecfeo.domain.repos.UserRepo
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val adapter = UserAdapter()
-    private val userRepo: UserRepo by lazy { app.userRepo }
+
+    private val viewModel: UsersViewModel by viewModels {
+        UserViewModelFactory(app.userRepo)
+    }
+
+    private val adapter = UserAdapter() { login ->
+        openInfoUserActivity(login)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         initView()
     }
 
     fun initView() {
 
+        viewModel.progressLiveData.observe(this) { showProgress(it) }
+        viewModel.usersLiveData.observe(this) { showUsers(it) }
+        viewModel.errorLiveData.observe(this) { showError(it) }
+
         binding.refreshActivityButton.setOnClickListener {
-            loadData()
+            viewModel.onRefresh()
         }
 
         initRecyclerView()
         showProgress(false)
-
-    }
-
-    private fun loadData() {
-
-        showProgress(true)
-        userRepo.getUsers(object : Callback<List<UserEntity>> {
-            override fun onResponse(
-                call: Call<List<UserEntity>>,
-                response: Response<List<UserEntity>>
-            ) {
-                showProgress(false)
-                val list = response.body()
-                if (response.isSuccessful && list != null) {
-                    adapter.setData(list)
-                }
-            }
-
-            override fun onFailure(call: Call<List<UserEntity>>, t: Throwable) {
-
-            }
-
-        })
     }
 
     private fun initRecyclerView() {
+        binding.usersRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.usersRecyclerView.adapter = this.adapter
+    }
 
-        with(binding.usersRecyclerView) {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = this@MainActivity.adapter
-        }
+    private fun showUsers(users: List<UserEntity>) {
+        adapter.setData(users)
+    }
 
+    private fun showError(throwable: Throwable) {
+        Toast.makeText(this, throwable.message, Toast.LENGTH_LONG).show()
     }
 
     private fun showProgress(visible: Boolean) {
+        binding.progressBar.isVisible = visible
+        binding.usersRecyclerView.isVisible = !visible
+    }
 
-        with(binding) {
-            progressBar.isVisible = visible
-            usersRecyclerView.isVisible = !visible
-        }
-
+    private fun openInfoUserActivity(login: String) {
+        val intent = Intent(this, UserInfoActivity::class.java)
+        intent.putExtra(UserInfoActivity.LOGIN, login)
+        startActivity(intent)
     }
 
 }
