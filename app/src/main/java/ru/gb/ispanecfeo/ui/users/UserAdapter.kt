@@ -5,7 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import ru.gb.ispanecfeo.domain.entities.UserEntity
 
-class UserAdapter(private val onClickUserCard: (String) -> Unit) : RecyclerView.Adapter<UserViewHolder>() {
+class UserAdapter(private val onClickUserCard: (String) -> Unit) :
+    RecyclerView.Adapter<UserViewHolder>() {
 
     private val listData = mutableListOf<UserEntity>()
 
