@@ -11,18 +11,19 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 import ru.gb.ispanecfeo.data.local.room.RetrofitUserRepoImpl
 import ru.gb.ispanecfeo.data.local.room.RoomUserRepoImpl
 import ru.gb.ispanecfeo.domain.entities.UserEntity
+import ru.gb.ispanecfeo.domain.entities.UserInfoEntity
 import ru.gb.ispanecfeo.domain.repos.UserRepo
 import ru.gb.ispanecfeo.ui.utils.mutable
 
-class UsersViewModel(
+class UserInfoViewModel(
     private val userRepoRemote: UserRepo.Remote,
-    private val userRepoLocal: UserRepo.Local
+    private val userRepoLocal: UserRepo.Local,
+    private val login: String
+) : ViewModel() {
 
-    ) : ViewModel() {
-
-    val usersLiveData: Observable<List<UserEntity>> = BehaviorSubject.create()
-    val errorLiveData: Observable<Throwable> = BehaviorSubject.create()
-    val progressLiveData: Observable<Boolean> = BehaviorSubject.create()
+    val userInfoLiveData: Observable<UserInfoEntity> = BehaviorSubject.create()
+    val userInfoErrorLiveData: Observable<Throwable> = BehaviorSubject.create()
+    val userInfoProgressLiveData: Observable<Boolean> = BehaviorSubject.create()
 
     fun onRefresh(remoteSource: Boolean) {
         showProgress(true)
@@ -33,44 +34,45 @@ class UsersViewModel(
             loadDataLocal()
     }
 
-
     private fun loadDataRemote() {
 
-        userRepoRemote.getUsers()
+        showProgress(true)
+
+        userRepoRemote.getInfoUser(login)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { userList ->
+                onSuccess = { userInfoData ->
                     showProgress(false)
-                    usersLiveData.mutable().onNext(userList)
-                    saveDataLocal(userList)
+                    userInfoLiveData.mutable().onNext(userInfoData)
+                    saveDataLocal(userInfoData)
                 },
                 onError = { error ->
                     showProgress(false)
-                    errorLiveData.mutable().onNext(error)
+                    userInfoErrorLiveData.mutable().onNext(error)
                 }
             )
     }
 
     private fun loadDataLocal() {
 
-        userRepoLocal.getUsers()
+        userRepoLocal.getInfoUser(login)
             ?.subscribeOn(Schedulers.io())
             ?.observeOn(AndroidSchedulers.mainThread())
             ?.subscribeBy(
-                onSuccess = { userList ->
+                onSuccess = { userInfoData ->
                     showProgress(false)
-                    usersLiveData.mutable().onNext(userList)
+                    userInfoLiveData.mutable().onNext(userInfoData)
                 },
                 onError = { error ->
                     showProgress(false)
-                    errorLiveData.mutable().onNext(error)
+                    userInfoErrorLiveData.mutable().onNext(error)
                 }
             )
 
     }
 
-    private fun saveDataLocal(userList: List<UserEntity>) {
-        userRepoLocal.addUsers(userList)
+    private fun saveDataLocal(userInfoData: UserInfoEntity) {
+        userRepoLocal.addUserInfo(userInfoData)
             ?.subscribeOn(Schedulers.io())
             ?.observeOn(AndroidSchedulers.mainThread())
             ?.subscribeBy(
@@ -84,15 +86,17 @@ class UsersViewModel(
 
     }
 
-    private fun showProgress(visible:Boolean) {
-        progressLiveData.mutable().onNext(visible)
+    private fun showProgress(visible: Boolean) {
+        userInfoProgressLiveData.mutable().onNext(visible)
     }
 
 }
 
-class UserViewModelFactory() : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T = UsersViewModel(
-        RetrofitUserRepoImpl(), RoomUserRepoImpl()
-    ) as T
+class UserInfoViewModelFactory(private val login: String) :
+    ViewModelProvider.Factory {
+
+    override fun <T : ViewModel> create(modelClass: Class<T>): T =
+        UserInfoViewModel(RetrofitUserRepoImpl(), RoomUserRepoImpl(), login) as T
+
 }
 
