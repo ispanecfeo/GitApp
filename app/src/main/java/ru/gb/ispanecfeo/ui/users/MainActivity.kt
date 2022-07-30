@@ -10,21 +10,30 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import ru.gb.ispanecfeo.appInstance
 import ru.gb.ispanecfeo.databinding.ActivityMainBinding
 import ru.gb.ispanecfeo.domain.entities.UserEntity
+import ru.gb.ispanecfeo.domain.repos.UserRepo
 import ru.gb.ispanecfeo.ui.userinfo.UserInfoActivity
 import ru.gb.ispanecfeo.ui.utils.NetworkStatus
 import ru.gb.ispanecfeo.ui.utils.observableClickListener
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModelDisposable = CompositeDisposable()
-    private val networkStatus: NetworkStatus = NetworkStatus()
-    private var remoteSource: Boolean = networkStatus.isOnline()
+
+    private val networkStatus: NetworkStatus by lazy { appInstance.networkStatus }
+    private var remoteSource: Boolean = true
+
+    private val userRepoRemote: UserRepo.Remote by lazy { appInstance.userRepoRemote }
+    private val userRepoLocal: UserRepo.Local by lazy { appInstance.userRepoLocal }
+
+    private var refreshPressed: Boolean = false
 
     private val viewModel: UsersViewModel by viewModels {
-        UserViewModelFactory()
+        UserViewModelFactory(userRepoRemote, userRepoLocal)
     }
 
     private val adapter = UserAdapter { login ->
@@ -49,12 +58,13 @@ class MainActivity : AppCompatActivity() {
             viewModel.errorLiveData.observeOn(AndroidSchedulers.mainThread())
                 .subscribe { showError(it) },
             networkStatus.getStatusConnected().observeOn(AndroidSchedulers.mainThread())
-                .subscribe { onСhangeDataSource(it) }
+                .subscribe { onChangeDataSource(it) }
         )
 
         binding.refreshActivityButton.observableClickListener()
-            .subscribeBy (
+            .subscribeBy(
                 onNext = {
+                    refreshPressed = true
                     viewModel.onRefresh(remoteSource)
                 },
                 onError = {
@@ -84,8 +94,10 @@ class MainActivity : AppCompatActivity() {
         binding.usersRecyclerView.isVisible = !visible
     }
 
-    private fun onСhangeDataSource(remote: Boolean) {
-        viewModel.onRefresh(remote)
+    private fun onChangeDataSource(remote: Boolean) {
+        if (refreshPressed) {
+            viewModel.onRefresh(remote)
+        }
         remoteSource = remote
     }
 

@@ -10,7 +10,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import ru.gb.ispanecfeo.data.local.room.RetrofitUserRepoImpl
 import ru.gb.ispanecfeo.data.local.room.RoomUserRepoImpl
-import ru.gb.ispanecfeo.domain.entities.UserEntity
 import ru.gb.ispanecfeo.domain.entities.UserInfoEntity
 import ru.gb.ispanecfeo.domain.repos.UserRepo
 import ru.gb.ispanecfeo.ui.utils.mutable
@@ -92,11 +91,15 @@ class UserInfoViewModel(
 
 }
 
-class UserInfoViewModelFactory(private val login: String) :
+class UserInfoViewModelFactory(
+    private val login: String,
+    private val userRepoRemote: UserRepo.Remote,
+    private val userRepoLocal: UserRepo.Local
+) :
     ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
-        UserInfoViewModel(RetrofitUserRepoImpl(), RoomUserRepoImpl(), login) as T
+        UserInfoViewModel(userRepoRemote, userRepoLocal, login) as T
 
 }
 

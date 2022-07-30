@@ -10,8 +10,10 @@ import coil.load
 import coil.transform.CircleCropTransformation
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import ru.gb.ispanecfeo.appInstance
 import ru.gb.ispanecfeo.databinding.ActivityInfoBinding
 import ru.gb.ispanecfeo.domain.entities.UserInfoEntity
+import ru.gb.ispanecfeo.domain.repos.UserRepo
 import ru.gb.ispanecfeo.ui.users.UserInfoViewModel
 import ru.gb.ispanecfeo.ui.users.UserInfoViewModelFactory
 import ru.gb.ispanecfeo.ui.utils.NetworkStatus
@@ -25,15 +27,24 @@ class UserInfoActivity : AppCompatActivity() {
     private lateinit var binding: ActivityInfoBinding
     private lateinit var login: String
     private val viewModelDisposable = CompositeDisposable()
-    private val networkStatus: NetworkStatus = NetworkStatus()
-    private var remoteSource: Boolean = networkStatus.isOnline()
+
+    private val userRepoRemote: UserRepo.Remote by lazy { appInstance.userRepoRemote }
+    private val userRepoLocal: UserRepo.Local by lazy { appInstance.userRepoLocal }
+
+    private val networkStatus: NetworkStatus  by lazy { appInstance.networkStatus }
+    private var remoteSource: Boolean = true
 
     private val viewModel: UserInfoViewModel by viewModels {
-        UserInfoViewModelFactory(login)
+        UserInfoViewModelFactory(
+            login,
+            userRepoRemote,
+            userRepoLocal
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityInfoBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
@@ -54,6 +65,7 @@ class UserInfoActivity : AppCompatActivity() {
                 .subscribe { onСhangeDataSource(it) }
         )
 
+        remoteSource = networkStatus.isOnline()
         viewModel.onRefresh(remoteSource)
     }
 
