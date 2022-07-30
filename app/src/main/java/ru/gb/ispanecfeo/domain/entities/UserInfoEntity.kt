@@ -1,12 +1,14 @@
 package ru.gb.ispanecfeo.domain.entities
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import com.google.gson.annotations.SerializedName
 
-@Entity(primaryKeys = ["id",])
-data class UserEntity(
+@Entity(primaryKeys = ["login",])
+data class UserInfoEntity(
     val login: String,
-    val id: Long,
     @SerializedName("avatar_url")
-    val avatarUrl: String
+    val avatarUrl: String,
+    val name: String,
+    val location: String
 )
