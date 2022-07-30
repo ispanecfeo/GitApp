@@ -79,21 +79,11 @@ class UsersViewModel(
                     Log.d("ROOM_DB", it.message!!)
                 }
             )
-
     }
 
     private fun showProgress(visible: Boolean) {
         progressLiveData.mutable().onNext(visible)
     }
-
 }
 
-class UserViewModelFactory(
-    private val userRepoRemote: UserRepo.Remote,
-    private val userRepoLocal: UserRepo.Local
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T = UsersViewModel(
-        userRepoRemote, userRepoLocal
-    ) as T
-}
 

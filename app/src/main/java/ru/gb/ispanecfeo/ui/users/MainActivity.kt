@@ -3,17 +3,16 @@ package ru.gb.ispanecfeo.ui.users
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
-import ru.gb.ispanecfeo.appInstance
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.gb.ispanecfeo.databinding.ActivityMainBinding
 import ru.gb.ispanecfeo.domain.entities.UserEntity
-import ru.gb.ispanecfeo.domain.repos.UserRepo
 import ru.gb.ispanecfeo.ui.userinfo.UserInfoActivity
 import ru.gb.ispanecfeo.ui.utils.NetworkStatus
 import ru.gb.ispanecfeo.ui.utils.observableClickListener
@@ -24,17 +23,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModelDisposable = CompositeDisposable()
 
-    private val networkStatus: NetworkStatus by lazy { appInstance.networkStatus }
+    private val networkStatus: NetworkStatus by inject()
     private var remoteSource: Boolean = true
-
-    private val userRepoRemote: UserRepo.Remote by lazy { appInstance.userRepoRemote }
-    private val userRepoLocal: UserRepo.Local by lazy { appInstance.userRepoLocal }
-
     private var refreshPressed: Boolean = false
 
-    private val viewModel: UsersViewModel by viewModels {
-        UserViewModelFactory(userRepoRemote, userRepoLocal)
-    }
+    private val viewModel: UsersViewModel by viewModel()
 
     private val adapter = UserAdapter { login ->
         openInfoUserActivity(login)
