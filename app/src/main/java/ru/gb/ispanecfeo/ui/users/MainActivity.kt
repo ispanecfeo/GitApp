@@ -11,11 +11,13 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import ru.gb.ispanecfeo.App
 import ru.gb.ispanecfeo.databinding.ActivityMainBinding
 import ru.gb.ispanecfeo.domain.entities.UserEntity
 import ru.gb.ispanecfeo.ui.userinfo.UserInfoActivity
 import ru.gb.ispanecfeo.ui.utils.NetworkStatus
 import ru.gb.ispanecfeo.ui.utils.observableClickListener
+import javax.inject.Inject
 
 
 class MainActivity : AppCompatActivity() {
@@ -23,21 +25,25 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModelDisposable = CompositeDisposable()
 
-    private val networkStatus: NetworkStatus by inject()
+    @Inject
+    lateinit var networkStatus: NetworkStatus
     private var remoteSource: Boolean = true
     private var refreshPressed: Boolean = false
 
-    private val viewModel: UsersViewModel by viewModel()
+    @Inject
+    lateinit var viewModel: UsersViewModel
 
     private val adapter = UserAdapter { login ->
         openInfoUserActivity(login)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        (application as App).appComponent.inject(this)
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         initView()
     }
 
