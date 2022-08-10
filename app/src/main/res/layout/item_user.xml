@@ -40,11 +40,13 @@
                     android:id="@+id/login_text_view"
                     android:textSize="@dimen/login_text_size"
                     android:textStyle="bold"
+                    android:layout_marginStart="@dimen/login_margin_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/uid_text_view"
+                    android:layout_marginStart="@dimen/id_margin_text_view"
                     android:textSize="@dimen/uid_text_size"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />

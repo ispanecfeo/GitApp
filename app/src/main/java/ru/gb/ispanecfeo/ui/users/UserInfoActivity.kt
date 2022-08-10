@@ -3,6 +3,7 @@ package ru.gb.ispanecfeo.ui.users
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import coil.load
@@ -18,33 +19,30 @@ class UserInfoActivity : AppCompatActivity(), UserInfoContract.View {
     }
 
     private lateinit var binding: ActivityInfoBinding
-    private lateinit var presenter: UserInfoContract.Presenter
     private lateinit var login: String
+
+    private val viewModel: UserInfoViewModel by viewModels {
+        UserInfoViewModelFactory(app.userRepo, login)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityInfoBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
 
         val arguments = intent.extras
         arguments?.let {
             login = it.get(LOGIN) as String
         }
-        presenter = extractPresenter()
-        presenter.attach(this)
 
-        presenter.onRefresh()
+        viewModel.userInfoLiveData.observe(this) { showData(it) }
+        viewModel.userInfoProgressLiveData.observe(this) { showProgress(it) }
+        viewModel.userInfoErrorLiveData.observe(this) { showError(it) }
+
+        viewModel.refresh()
     }
 
-    private fun extractPresenter(): UserInfoContract.Presenter {
-        return lastCustomNonConfigurationInstance as? UserInfoContract.Presenter
-            ?: UserInfoPresenter(app.userRepo, login)
-    }
-
-    override fun onDestroy() {
-        presenter.detach()
-        super.onDestroy()
-    }
 
     override fun showData(userInfo: UserInfoEntity) {
         binding.imgUser.load(userInfo.avatarUrl) {
