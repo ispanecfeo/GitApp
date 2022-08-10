@@ -11,10 +11,12 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import ru.gb.ispanecfeo.App
 import ru.gb.ispanecfeo.databinding.ActivityInfoBinding
 import ru.gb.ispanecfeo.domain.entities.UserInfoEntity
 import ru.gb.ispanecfeo.ui.users.UserInfoViewModel
 import ru.gb.ispanecfeo.ui.utils.NetworkStatus
+import javax.inject.Inject
 
 class UserInfoActivity : AppCompatActivity() {
 
@@ -26,16 +28,19 @@ class UserInfoActivity : AppCompatActivity() {
     private lateinit var login: String
     private val viewModelDisposable = CompositeDisposable()
 
-    private val networkStatus: NetworkStatus  by inject()
+    @Inject
+    lateinit var networkStatus: NetworkStatus
     private var remoteSource: Boolean = true
 
-    private val viewModel: UserInfoViewModel by viewModel()
+    @Inject
+    lateinit var viewModel: UserInfoViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        (application as App).appComponent.inject(this)
+
         super.onCreate(savedInstanceState)
 
         binding = ActivityInfoBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
 
         val arguments = intent.extras
