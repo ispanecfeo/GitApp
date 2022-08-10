@@ -9,10 +9,12 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.subscribeBy
 import ru.gb.ispanecfeo.databinding.ActivityMainBinding
 import ru.gb.ispanecfeo.domain.entities.UserEntity
 import ru.gb.ispanecfeo.ui.userinfo.UserInfoActivity
 import ru.gb.ispanecfeo.ui.utils.NetworkStatus
+import ru.gb.ispanecfeo.ui.utils.observableClickListener
 
 class MainActivity : AppCompatActivity() {
 
@@ -50,9 +52,15 @@ class MainActivity : AppCompatActivity() {
                 .subscribe { onСhangeDataSource(it) }
         )
 
-        binding.refreshActivityButton.setOnClickListener {
-            viewModel.onRefresh(remoteSource)
-        }
+        binding.refreshActivityButton.observableClickListener()
+            .subscribeBy (
+                onNext = {
+                    viewModel.onRefresh(remoteSource)
+                },
+                onError = {
+                    Toast.makeText(this, it.message, Toast.LENGTH_LONG)
+                }
+            )
 
         initRecyclerView()
         showProgress(false)
