@@ -1,18 +1,20 @@
 package ru.gb.ispanecfeo
 
 import android.app.Application
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
+import ru.gb.ispanecfeo.di.appModule
 
 class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        app = this
+
+        startKoin {
+            androidLogger()
+            androidContext(this@App)
+            modules(appModule)
+        }
     }
-
-
-    companion object {
-        var app: App? = null
-    }
-
-
 }

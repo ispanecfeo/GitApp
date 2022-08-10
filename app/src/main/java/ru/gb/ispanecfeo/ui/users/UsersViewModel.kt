@@ -8,8 +8,6 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
-import ru.gb.ispanecfeo.data.local.room.RetrofitUserRepoImpl
-import ru.gb.ispanecfeo.data.local.room.RoomUserRepoImpl
 import ru.gb.ispanecfeo.domain.entities.UserEntity
 import ru.gb.ispanecfeo.domain.repos.UserRepo
 import ru.gb.ispanecfeo.ui.utils.mutable
@@ -18,7 +16,7 @@ class UsersViewModel(
     private val userRepoRemote: UserRepo.Remote,
     private val userRepoLocal: UserRepo.Local
 
-    ) : ViewModel() {
+) : ViewModel() {
 
     val usersLiveData: Observable<List<UserEntity>> = BehaviorSubject.create()
     val errorLiveData: Observable<Throwable> = BehaviorSubject.create()
@@ -81,18 +79,11 @@ class UsersViewModel(
                     Log.d("ROOM_DB", it.message!!)
                 }
             )
-
     }
 
-    private fun showProgress(visible:Boolean) {
+    private fun showProgress(visible: Boolean) {
         progressLiveData.mutable().onNext(visible)
     }
-
 }
 
-class UserViewModelFactory() : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T = UsersViewModel(
-        RetrofitUserRepoImpl(), RoomUserRepoImpl()
-    ) as T
-}
 

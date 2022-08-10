@@ -3,17 +3,17 @@ package ru.gb.ispanecfeo.ui.userinfo
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import coil.load
 import coil.transform.CircleCropTransformation
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.gb.ispanecfeo.databinding.ActivityInfoBinding
 import ru.gb.ispanecfeo.domain.entities.UserInfoEntity
 import ru.gb.ispanecfeo.ui.users.UserInfoViewModel
-import ru.gb.ispanecfeo.ui.users.UserInfoViewModelFactory
 import ru.gb.ispanecfeo.ui.utils.NetworkStatus
 
 class UserInfoActivity : AppCompatActivity() {
@@ -25,15 +25,15 @@ class UserInfoActivity : AppCompatActivity() {
     private lateinit var binding: ActivityInfoBinding
     private lateinit var login: String
     private val viewModelDisposable = CompositeDisposable()
-    private val networkStatus: NetworkStatus = NetworkStatus()
-    private var remoteSource: Boolean = networkStatus.isOnline()
 
-    private val viewModel: UserInfoViewModel by viewModels {
-        UserInfoViewModelFactory(login)
-    }
+    private val networkStatus: NetworkStatus  by inject()
+    private var remoteSource: Boolean = true
+
+    private val viewModel: UserInfoViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityInfoBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
@@ -54,7 +54,8 @@ class UserInfoActivity : AppCompatActivity() {
                 .subscribe { onСhangeDataSource(it) }
         )
 
-        viewModel.onRefresh(remoteSource)
+        remoteSource = networkStatus.isOnline()
+        viewModel.onRefresh(remoteSource, login)
     }
 
 
@@ -69,7 +70,7 @@ class UserInfoActivity : AppCompatActivity() {
     }
 
     private fun onСhangeDataSource(remote: Boolean) {
-        viewModel.onRefresh(remote)
+        viewModel.onRefresh(remote, login)
         remoteSource = remote
     }
 
