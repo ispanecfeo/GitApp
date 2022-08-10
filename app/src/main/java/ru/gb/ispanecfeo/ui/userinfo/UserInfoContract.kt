@@ -1,4 +1,4 @@
-package ru.gb.ispanecfeo.ui.users
+package ru.gb.ispanecfeo.ui.userinfo
 
 import ru.gb.ispanecfeo.domain.entities.UserInfoEntity
 
