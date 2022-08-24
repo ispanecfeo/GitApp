@@ -10,10 +10,10 @@ import coil.load
 import coil.transform.CircleCropTransformation
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import ru.gb.ispanecfeo.appInstance
 import ru.gb.ispanecfeo.databinding.ActivityInfoBinding
 import ru.gb.ispanecfeo.domain.entities.UserInfoEntity
 import ru.gb.ispanecfeo.domain.repos.UserRepo
+import ru.gb.ispanecfeo.inject
 import ru.gb.ispanecfeo.ui.users.UserInfoViewModel
 import ru.gb.ispanecfeo.ui.users.UserInfoViewModelFactory
 import ru.gb.ispanecfeo.ui.utils.NetworkStatus
@@ -28,10 +28,10 @@ class UserInfoActivity : AppCompatActivity() {
     private lateinit var login: String
     private val viewModelDisposable = CompositeDisposable()
 
-    private val userRepoRemote: UserRepo.Remote by lazy { appInstance.userRepoRemote }
-    private val userRepoLocal: UserRepo.Local by lazy { appInstance.userRepoLocal }
+    private val userRepoRemote: UserRepo.Remote by inject()
+    private val userRepoLocal: UserRepo.Local by inject()
 
-    private val networkStatus: NetworkStatus  by lazy { appInstance.networkStatus }
+    private val networkStatus: NetworkStatus  by inject()
     private var remoteSource: Boolean = true
 
     private val viewModel: UserInfoViewModel by viewModels {
