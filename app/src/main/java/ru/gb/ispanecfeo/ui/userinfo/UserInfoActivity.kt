@@ -9,11 +9,10 @@ import coil.load
 import coil.transform.CircleCropTransformation
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import ru.gb.ispanecfeo.App
 import ru.gb.ispanecfeo.databinding.ActivityInfoBinding
 import ru.gb.ispanecfeo.domain.entities.UserInfoEntity
+import ru.gb.ispanecfeo.domain.repos.UserRepo
+import ru.gb.ispanecfeo.inject
 import ru.gb.ispanecfeo.ui.users.UserInfoViewModel
 import ru.gb.ispanecfeo.ui.utils.NetworkStatus
 import javax.inject.Inject
@@ -28,12 +27,14 @@ class UserInfoActivity : AppCompatActivity() {
     private lateinit var login: String
     private val viewModelDisposable = CompositeDisposable()
 
-    @Inject
-    lateinit var networkStatus: NetworkStatus
+
+    private val userRepoRemote: UserRepo.Remote by inject()
+    private val userRepoLocal: UserRepo.Local by inject()
+
+    private val networkStatus: NetworkStatus  by inject()
+
     private var remoteSource: Boolean = true
 
-    @Inject
-    lateinit var viewModel: UserInfoViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         (application as App).appComponent.inject(this)

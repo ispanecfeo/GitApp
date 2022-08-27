@@ -9,11 +9,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import ru.gb.ispanecfeo.App
 import ru.gb.ispanecfeo.databinding.ActivityMainBinding
 import ru.gb.ispanecfeo.domain.entities.UserEntity
+import ru.gb.ispanecfeo.domain.repos.UserRepo
+import ru.gb.ispanecfeo.inject
 import ru.gb.ispanecfeo.ui.userinfo.UserInfoActivity
 import ru.gb.ispanecfeo.ui.utils.NetworkStatus
 import ru.gb.ispanecfeo.ui.utils.observableClickListener
@@ -25,9 +24,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModelDisposable = CompositeDisposable()
 
-    @Inject
-    lateinit var networkStatus: NetworkStatus
+    private val networkStatus: NetworkStatus by inject()
     private var remoteSource: Boolean = true
+
+    private val userRepoRemote: UserRepo.Remote by inject()
+    private val userRepoLocal: UserRepo.Local by inject()
+
     private var refreshPressed: Boolean = false
 
     @Inject
