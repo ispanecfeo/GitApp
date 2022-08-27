@@ -3,7 +3,6 @@ package ru.gb.ispanecfeo.ui.users
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +16,7 @@ import ru.gb.ispanecfeo.inject
 import ru.gb.ispanecfeo.ui.userinfo.UserInfoActivity
 import ru.gb.ispanecfeo.ui.utils.NetworkStatus
 import ru.gb.ispanecfeo.ui.utils.observableClickListener
+import javax.inject.Inject
 
 
 class MainActivity : AppCompatActivity() {
@@ -32,19 +32,20 @@ class MainActivity : AppCompatActivity() {
 
     private var refreshPressed: Boolean = false
 
-    private val viewModel: UsersViewModel by viewModels {
-        UserViewModelFactory(userRepoRemote, userRepoLocal)
-    }
+    @Inject
+    lateinit var viewModel: UsersViewModel
 
     private val adapter = UserAdapter { login ->
         openInfoUserActivity(login)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        (application as App).appComponent.inject(this)
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         initView()
     }
 

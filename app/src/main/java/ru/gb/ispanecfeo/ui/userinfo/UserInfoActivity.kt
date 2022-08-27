@@ -3,7 +3,6 @@ package ru.gb.ispanecfeo.ui.userinfo
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import coil.load
@@ -15,8 +14,8 @@ import ru.gb.ispanecfeo.domain.entities.UserInfoEntity
 import ru.gb.ispanecfeo.domain.repos.UserRepo
 import ru.gb.ispanecfeo.inject
 import ru.gb.ispanecfeo.ui.users.UserInfoViewModel
-import ru.gb.ispanecfeo.ui.users.UserInfoViewModelFactory
 import ru.gb.ispanecfeo.ui.utils.NetworkStatus
+import javax.inject.Inject
 
 class UserInfoActivity : AppCompatActivity() {
 
@@ -28,25 +27,21 @@ class UserInfoActivity : AppCompatActivity() {
     private lateinit var login: String
     private val viewModelDisposable = CompositeDisposable()
 
+
     private val userRepoRemote: UserRepo.Remote by inject()
     private val userRepoLocal: UserRepo.Local by inject()
 
     private val networkStatus: NetworkStatus  by inject()
+
     private var remoteSource: Boolean = true
 
-    private val viewModel: UserInfoViewModel by viewModels {
-        UserInfoViewModelFactory(
-            login,
-            userRepoRemote,
-            userRepoLocal
-        )
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        (application as App).appComponent.inject(this)
+
         super.onCreate(savedInstanceState)
 
         binding = ActivityInfoBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
 
         val arguments = intent.extras
@@ -66,7 +61,7 @@ class UserInfoActivity : AppCompatActivity() {
         )
 
         remoteSource = networkStatus.isOnline()
-        viewModel.onRefresh(remoteSource)
+        viewModel.onRefresh(remoteSource, login)
     }
 
 
@@ -81,7 +76,7 @@ class UserInfoActivity : AppCompatActivity() {
     }
 
     private fun onСhangeDataSource(remote: Boolean) {
-        viewModel.onRefresh(remote)
+        viewModel.onRefresh(remote, login)
         remoteSource = remote
     }
 

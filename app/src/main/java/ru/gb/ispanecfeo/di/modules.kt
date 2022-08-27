@@ -23,6 +23,7 @@ val appModule = module {
      val gitHubBaseUrl = "https://api.github.com/"
 
     single<Retrofit> {
+
         Retrofit.Builder()
             .baseUrl(gitHubBaseUrl)
             .addConverterFactory(
